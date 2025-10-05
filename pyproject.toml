@@ -4,13 +4,21 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "requests>=2.32.4",
+]
+
 
 [dependency-groups]
 dev = [
-    "requests>=2.32.4",
     "ruff>=0.12.0",
 ]
 
-[tool-ruff]
+[tool.ruff]
 lint.extend-select = ["N", "I", "E"]
+line-length = 88
+indent-width = 4
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

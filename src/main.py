@@ -1,13 +1,23 @@
-import functions
+import extract
+import transform
+import load
+import argparse
 
-def main():
+
+def etl(limit : int) -> None:
     url = "https://dummyjson.com/users"
-    users = functions.fetch_users_in_batches(url, 100)
-    data = functions.get_cart_data()
-    users = functions.find_fav_cart_category_for_users(users, data)
+    users = extract.fetch_users_in_batches(url, limit)
+    data = extract.get_cart_data()
+    users = transform.find_fav_cart_category_for_users(users, data)
 
-    functions.save_as_csv(users)
-    functions.save_to_db(users)
+    load.save_as_csv(users)
+    load.save_to_db(users)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description = "Script that extracts data from dummyjson in batches, transform it and saves in .csv file and sql database."
+    )
+    parser.add_argument("--limit", required = True, type = int, default = 100, help = "Please provide number of records per batch.")
+    args = parser.parse_args()
+    limit = args.limit
+    etl(limit)

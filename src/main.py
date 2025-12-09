@@ -1,10 +1,11 @@
-import extract
-import transform
-import load
 import argparse
 
+import extract
+import load
+import transform
 
-def etl(limit : int) -> None:
+
+def etl(limit: int) -> None:
     url = "https://dummyjson.com/users"
     users = extract.fetch_users_in_batches(url, limit)
     data = extract.get_cart_data()
@@ -13,11 +14,18 @@ def etl(limit : int) -> None:
     load.save_as_csv(users)
     load.save_to_db(users)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description = "Script that extracts data from dummyjson in batches, transform it and saves in .csv file and sql database."
+        description="Script that extracts data from dummyjson in batches, transform it and saves in .csv file and sql database."
     )
-    parser.add_argument("--limit", required = True, type = int, default = 100, help = "Please provide number of records per batch.")
+    parser.add_argument(
+        "--limit",
+        required=True,
+        type=int,
+        default=100,
+        help="Please provide number of records per batch.",
+    )
     args = parser.parse_args()
     limit = args.limit
     etl(limit)

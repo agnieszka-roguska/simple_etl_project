@@ -1,8 +1,11 @@
-import transform
 import os
+
 import requests
 
+import transform
+
 API_KEY = os.getenv("API_KEY")
+
 
 def fetch_users_in_batches(base_url: str, limit: int) -> list[dict]:
     all_users = list()
@@ -12,8 +15,8 @@ def fetch_users_in_batches(base_url: str, limit: int) -> list[dict]:
         response = requests.get(url)
         data = response.json()
         users = data.get("users")
-        if not users: #break loop when 'users' is empty
-            break 
+        if not users:  # break loop when 'users' is empty
+            break
         users_processed = transform.process_users_data(users)
         all_users += users_processed
         total = data.get("total", 0)
@@ -23,6 +26,7 @@ def fetch_users_in_batches(base_url: str, limit: int) -> list[dict]:
         skip += limit
 
     return all_users
+
 
 def get_country(lng: str, lat: str) -> str:
     endpoint = (
@@ -34,10 +38,10 @@ def get_country(lng: str, lat: str) -> str:
         return data["results"][0]["components"]["country"]
     except Exception:
         return "Unknown"
-    
+
+
 def get_cart_data() -> list[dict]:
     url = "https://dummyjson.com/carts"
     response = requests.get(url)
     data = response.json()
     return data.get("carts")
-    

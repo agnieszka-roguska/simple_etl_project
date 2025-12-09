@@ -19,10 +19,11 @@ simple_etl_project/
 │   ├── extract.py
 │   ├── transform.py
 │   └── load.py
-│   └── sql/
-│   │   ├── clean_table.sql
-│   │   ├── create_table.sql
-│   │   └── insert_user_data.sql
+│
+├── sql/
+│   ├── clean_table.sql
+│   ├── create_table.sql
+│   └── insert_user_data.sql
 │
 ├── results/
 │   ├── users_data.csv
@@ -43,9 +44,7 @@ simple_etl_project/
 ```
 2. Install the uv dependencies 
 ```
-    pip install uv
-    uv init
-    uv sync 
+    pip install uv uv init uv sync 
 ```
 
 ## Create the .env file
@@ -54,9 +53,8 @@ Add your API key for geolocation in an .env file at the root of the project.
 API_KEY = your_opencagedata_api_key_here 
 ```
 ## Usage 
-Run the application from the terminal: python main --limit <number>
+Run the application 
 
-example: 
 ``` 
 python main.py --limit 100
 

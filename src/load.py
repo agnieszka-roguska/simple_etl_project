@@ -27,14 +27,15 @@ def save_as_csv(data: list[dict]) -> None:
 def save_to_db(users_data: list[dict]) -> None:
     results_folder = get_results_directory()
     db_file_path = os.path.join(results_folder, "results.db")
+    sql_dir = os.path.join(os.path.dirname(__file__), "sql")
 
-    with open(".\sql\create_table.sql", "r") as sql_file:  # create new table
+    with open(os.path.join(sql_dir, "create_table.sql"), "r") as sql_file:  # create new table
         create_table_script = sql_file.read()
 
-    with open(".\sql\clean_table.sql", "r") as sql_file:  # delete all old records
+    with open(os.path.join(sql_dir, "clean_table.sql"), "r") as sql_file:  # delete all old records
         clean_table_script = sql_file.read()
 
-    with open(".\sql\insert_user_data.sql", "r") as sql_file:  # insert new data
+    with open(os.path.join(sql_dir, "insert_user_data.sql"), "r") as sql_file:  # insert new data
         insert_user_data_script = sql_file.read()
 
     connection = sqlite3.connect(db_file_path)

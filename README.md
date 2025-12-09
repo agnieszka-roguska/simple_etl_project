@@ -53,8 +53,9 @@ Add your API key for geolocation in an .env file at the root of the project.
 API_KEY = your_opencagedata_api_key_here 
 ```
 ## Usage 
-Run the application 
+Run the application from the terminal: python main --limit <number>
 
+example: 
 ``` 
 python main.py --limit 100
 

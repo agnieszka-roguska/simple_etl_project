@@ -41,7 +41,7 @@ def save_to_db(users_data: list[dict]) -> None:
     connection = sqlite3.connect(db_file_path)
     cur = connection.cursor()  # to execute commands on the database
     cur.execute(create_table_script)
-    cur.execute(clean_table_script)
+    #cur.execute(clean_table_script) TODO: add cleaning table at the beginning of writing new results to the table - separate function opening connection to be created - maybe cleaning table at this level - not to open and close it all the time
 
     for user in users_data:
         cur.execute(

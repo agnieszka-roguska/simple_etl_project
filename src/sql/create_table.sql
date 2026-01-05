@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS users (
     lng REAL,
     country TEXT,
     fav_category_in_cart TEXT
-);
+) STRICT;

@@ -7,12 +7,13 @@ import transform
 
 def etl(limit: int) -> None:
     url = "https://dummyjson.com/users"
-    users = extract.fetch_users_in_batches(url, limit)
-    data = extract.get_cart_data()
-    users = transform.find_fav_cart_category_for_users(users, data)
+    cart_data = extract.get_cart_data()
 
-    load.save_as_csv(users)
-    load.save_to_db(users)
+    for raw_users_batch in extract.fetch_users_in_batches(url, limit):
+        transformed_batch = transform.process_users_data(raw_users_batch)
+        enriched = transform.find_fav_cart_category_for_users(transformed_batch, cart_data)
+        load.save_as_csv(enriched)
+        load.save_to_db(enriched)
 
 
 if __name__ == "__main__":

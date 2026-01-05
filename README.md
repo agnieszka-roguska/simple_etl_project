@@ -35,6 +35,10 @@ simple_etl_project/
 ├── uv.lock
 ├── README.md
 ```
+
+## Requirements
+Python >= 3.11
+
 ## Setup and Installation
 1. Clone repository
 ``` bash
@@ -42,8 +46,8 @@ simple_etl_project/
     cd simple_etl_project
 ```
 2. Install the uv dependencies 
+    - Install uv https://docs.astral.sh/uv/getting-started/installation/
 ```
-    pip install uv 
     uv init 
     uv sync 
 ```

@@ -1,21 +1,20 @@
 import os
+import api
+from dotenv import load_dotenv
 
-import requests
+from config import OPENGAGE_CONFIG
+from config import DUMMYJSON_CONFIG
 
-import transform
+load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
 
-
-def fetch_users_in_batches(base_url: str, limit: int) -> list[dict]:
+def fetch_users_in_batches(limit: int) -> list[dict]:
     skip = 0
 
     while True:
-        url = base_url + f"?limit={limit}&skip={skip}"
-        response = requests.get(url)
-        response.raise_for_status()
-
-        data = response.json()
+        url = DUMMYJSON_CONFIG["base_url"] + DUMMYJSON_CONFIG["endpoints"]["users_url"] + f"?limit={limit}&skip={skip}"
+        data = api.extract_data(url)
         users = data.get("users", [])
 
         if not users:
@@ -32,10 +31,10 @@ def fetch_users_in_batches(base_url: str, limit: int) -> list[dict]:
 
 def get_country(lng: str, lat: str) -> str:
     endpoint = (
-        f"https://api.opencagedata.com/geocode/v1/json?q={lat}+{lng}&key={API_KEY}"
+        OPENGAGE_CONFIG["base_url"] + OPENGAGE_CONFIG["endpoints"]["geocode"] + f"/json?q={lat}+{lng}&key={API_KEY}" 
     )
-    response = requests.get(endpoint)
-    data = response.json()
+
+    data = api.extract_data(endpoint)
     try:
         return data["results"][0]["components"]["country"]
     except Exception:
@@ -43,7 +42,6 @@ def get_country(lng: str, lat: str) -> str:
 
 
 def get_cart_data() -> list[dict]:
-    url = "https://dummyjson.com/carts"
-    response = requests.get(url)
-    data = response.json()
+    url = DUMMYJSON_CONFIG["base_url"] + DUMMYJSON_CONFIG["endpoints"]["carts_url"]
+    data = api.extract_data(url)
     return data.get("carts")

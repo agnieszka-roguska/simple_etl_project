@@ -11,7 +11,7 @@ def get_results_directory() -> str:
     return results_folder
 
 
-def save_as_csv(data: list[dict]) -> None:
+def save_as_csv(data: list[dict]) -> None: #TODO: right now there is only the newest batch data in the csv file - fix it
     results_folder = get_results_directory()
     os.makedirs(results_folder, exist_ok=True)  # Make sure the folder exists
     csv_file_path = os.path.join(
@@ -19,34 +19,37 @@ def save_as_csv(data: list[dict]) -> None:
     )  # Define the full path to the file you want to save
 
     with open(csv_file_path, mode="w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=data[0].keys())
+        writer = csv.DictWriter(file, fieldnames=list(data[0].keys()))
         writer.writeheader()
         writer.writerows(data)
 
-
-def save_to_db(users_data: list[dict]) -> None:
+def open_db_connection() -> sqlite3.Connection:
     results_folder = get_results_directory()
     db_file_path = os.path.join(results_folder, "results.db")
-    sql_dir = os.path.join(os.path.dirname(__file__), "sql")
 
+    return sqlite3.connect(db_file_path)
+
+def initialize_db(connection : sqlite3.Connection)-> None:
+    sql_dir = os.path.join(os.path.dirname(__file__), "sql")
     with open(os.path.join(sql_dir, "create_table.sql"), "r") as sql_file:  # create new table
         create_table_script = sql_file.read()
 
     with open(os.path.join(sql_dir, "clean_table.sql"), "r") as sql_file:  # delete all old records
         clean_table_script = sql_file.read()
 
+    cur = connection.cursor()
+    cur.execute(create_table_script)
+    cur.execute(clean_table_script)
+    connection.commit()
+
+def save_batch_to_db(users_data: list[dict], connection : sqlite3.Connection) -> None: 
+    
+    sql_dir = os.path.join(os.path.dirname(__file__), "sql")
+
     with open(os.path.join(sql_dir, "insert_user_data.sql"), "r") as sql_file:  # insert new data
         insert_user_data_script = sql_file.read()
 
-    connection = sqlite3.connect(db_file_path)
-    cur = connection.cursor()  # to execute commands on the database
-    cur.execute(create_table_script)
-    #cur.execute(clean_table_script) TODO: add cleaning table at the beginning of writing new results to the table - separate function opening connection to be created - maybe cleaning table at this level - not to open and close it all the time
-
-    for user in users_data:
-        cur.execute(
-            insert_user_data_script,
-            (
+    users_tuples = [(
                 user["firstName"],
                 user["lastName"],
                 user["age"],
@@ -56,8 +59,12 @@ def save_to_db(users_data: list[dict]) -> None:
                 user["lng"],
                 user["country"],
                 user["fav_category_in_cart"],
-            ),
-        )
-
+            ) for user in users_data
+        ]
+    
+    cur = connection.cursor()
+    cur.executemany(insert_user_data_script, users_tuples)
     connection.commit()
+
+def close_db_connection(connection : sqlite3.Connection):
     connection.close()

@@ -1,8 +1,10 @@
 import extract
+from collections import Counter
 
 
 def process_users_data(users_data: list[dict]) -> list[dict[str]]: 
     required_fields = {"id", "firstName", "lastName", "age", "gender", "email"}
+
     for index, user in enumerate(users_data):
         user_filtered = {k: v for k, v in user.items() if k in required_fields}
         coords = user.get("address", {}).get("coordinates", {})
@@ -12,11 +14,12 @@ def process_users_data(users_data: list[dict]) -> list[dict[str]]:
         user_filtered["lng"] = lng
         user_filtered["country"] = extract.get_country(lng, lat)
         users_data[index] = user_filtered
+
     return users_data
 
 
 def get_category_from_thumbnail(thumbnail: str) -> str:
-    prefix_to_remove = "https://cdn.dummyjson.com/products/images/"
+    prefix_to_remove = "https://cdn.dummyjson.com/products/images/" 
     if thumbnail.startswith(prefix_to_remove):
         category = thumbnail[len(prefix_to_remove) :].split("/")[0]
         return category
@@ -24,7 +27,7 @@ def get_category_from_thumbnail(thumbnail: str) -> str:
         raise ValueError("Thumbnail prefix has changed or is invalid.")
 
 
-def find_fav_cart_category_for_users(
+"""def find_fav_cart_category_for_users(
     users: list[dict], carts: list[dict]
 ) -> list[dict]:
     user_map = {user["id"]: user for user in users}
@@ -57,5 +60,34 @@ def find_fav_cart_category_for_users(
 
     for user in users:  # ensure all users have the key
         user["fav_category_in_cart"] = user.get("fav_category_in_cart")
+
+    return users"""
+
+def find_fav_cart_category(cart: dict) -> list[dict]:
+    counter = Counter()
+    products = cart["products"]
+    for product in products:
+        title = product["title"]
+        quantity = product["quantity"]
+
+        if title and quantity > 0:
+            counter[title] += quantity
+        
+        if not counter:
+            return None
+
+    return counter.most_common(1)[0][0]
+
+def users_add_fav_cart_category(users : list[dict], carts : list[dict]) -> list[dict]:
+    user_map = {user["id"] : user for user in users}
+    for user in users:
+        user["fav_category_in_cart"] = None
+
+    for cart in carts:
+        user = user_map.get(cart.get("userId"))
+        if not user:
+            continue
+
+        user["fav_category_in_cart"] = find_fav_cart_category(cart = cart)  
 
     return users

@@ -1,0 +1,12 @@
+[dummyjson]
+base_url = "https://dummyjson.com"
+
+[dummyjson.endpoints]
+users_url = "/users"
+carts_url = "/carts"
+
+[opencage]
+base_url = "https://api.opencagedata.com"
+
+[opencage.endpoints]
+geocode = "/geocode/v1"
